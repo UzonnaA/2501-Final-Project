@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 # Name of project
-set(PROJ_NAME ParticleDemo)
+set(PROJ_NAME FinalProject)
 project(${PROJ_NAME})
 
 # Specify project files: header files and source files
