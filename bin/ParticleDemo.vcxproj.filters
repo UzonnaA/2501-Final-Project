@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\file_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\game_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\player_game_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\file_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\game_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\player_game_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\sprite_vertex_shader.glsl" />
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\sprite_fragment_shader.glsl" />
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_vertex_shader.glsl" />
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_fragment_shader.glsl" />
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_fragment_2.glsl" />
+    <None Include="C:\Users\uzonn\Downloads\University\2501\COMP 2501\Project\2501-Final-Project\particle_vertex_2.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CF7738D1-D9C8-3E70-838D-D231EA48FD28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{76B011CC-A8F5-371A-988C-97C890D16E20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
