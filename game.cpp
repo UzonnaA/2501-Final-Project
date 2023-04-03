@@ -34,6 +34,8 @@ const unsigned int window_width_g = 800;
 const unsigned int window_height_g = 600;
 const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
 bool UI_on = false;
+static std::chrono::time_point<std::chrono::system_clock> game_start_time = std::chrono::system_clock::now();
+
 
 // Directory with game resources such as textures
 const std::string resources_directory_g = RESOURCES_DIRECTORY;
@@ -279,11 +281,32 @@ void Game::MainLoop(void)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            //Computing the time
+            //Get elapsed time in seconds
+            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+            int elapsed_time = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(now - game_start_time).count());
+
+            //Calculate minutes and seconds
+            int minutes = elapsed_time / 60;
+            int seconds = elapsed_time % 60;
+
+            //Format time string
+            std::string time_str = "Time: " + std::to_string(minutes) + "m " + std::to_string(seconds) + "s";
+
             
 
-            //Text Demo
-            std::string text = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
-            ImGui::Text(text.c_str());
+            
+
+            //Menu Text
+            std::string KillText = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
+            std::string HealthText = "Current Health: " + std::to_string(game_objects_[0]->GetHealth());
+            ImGui::Text(time_str.c_str());
+            ImGui::Text(HealthText.c_str());
+            ImGui::Text(KillText.c_str());
+
+
+
+            
 
             //You can just call Text again to add more text to the GUI
             //ImGui::Text(text.c_str());

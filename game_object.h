@@ -36,6 +36,7 @@ namespace game {
             inline glm::vec3& GetPosition(void) { return position_; }
             inline float GetScale(void) { return scale_; }
             inline int GetKillCount(void) { return killCount_; }
+            inline int GetHealth(void) { return health_; }
             inline float GetAngle(void) { return angle_; }
             inline glm::vec3& GetVelocity(void) { return velocity_; }
             inline bool CheckDead(void) { return isDead_; }
@@ -66,8 +67,18 @@ namespace game {
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
             inline void SetMustDie(bool die) { mustDie_ = die; }
             inline void IncrementKillCount(void) { killCount_ += 1; }
-            inline void SetType(std::string type) { type_ = type; }
             
+            
+            inline void SetType(std::string type) { 
+                type_ = type;
+                if (type_ == "enemy") {
+                    //change the health do a different value perhaps?
+                    //Don't have to, but you could do that here
+                }
+            }
+            
+            inline void TakeDamage(int damage) { health_ -= damage; }
+
             inline void SetParent(GameObject* parent) { 
                 parent_ = parent; 
                 isChild_ = true;
@@ -107,6 +118,9 @@ namespace game {
 
             //Keep track of player kills
             int killCount_;
+
+            //Keep track of health
+            int health_;
 
             
 

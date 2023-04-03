@@ -31,6 +31,8 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     parent_ = nullptr;
     isChild_ = false;
     killCount_ = 0;
+    //feel free to change this value
+    health_ = 5;
     
 
    
