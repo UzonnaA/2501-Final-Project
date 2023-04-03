@@ -15,6 +15,13 @@ set(HDRS
     sprite.h
     particles.h
     particle_system.h
+    imconfig.h
+    imgui.h
+    imgui_internal.h
+    imstb_rectpack.h
+    imstb_textedit.h
+    imstb_truetype.h
+
 )
  
 set(SRCS
@@ -27,6 +34,11 @@ set(SRCS
     sprite.cpp
     particles.cpp
     particle_system.cpp
+    imgui.cpp
+    imgui_demo.cpp
+    imgui_draw.cpp
+    imgui_tables.cpp
+    imgui_widgets.cpp
     sprite_vertex_shader.glsl
     sprite_fragment_shader.glsl
     particle_vertex_shader.glsl
