@@ -35,6 +35,7 @@ namespace game {
             // Getters
             inline glm::vec3& GetPosition(void) { return position_; }
             inline float GetScale(void) { return scale_; }
+            inline int GetKillCount(void) { return killCount_; }
             inline float GetAngle(void) { return angle_; }
             inline glm::vec3& GetVelocity(void) { return velocity_; }
             inline bool CheckDead(void) { return isDead_; }
@@ -64,6 +65,7 @@ namespace game {
             void SetAngle(float angle);
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
             inline void SetMustDie(bool die) { mustDie_ = die; }
+            inline void IncrementKillCount(void) { killCount_ += 1; }
             inline void SetType(std::string type) { type_ = type; }
             
             inline void SetParent(GameObject* parent) { 
@@ -102,6 +104,9 @@ namespace game {
             //Need this to do hierarchy transforms
             GameObject* parent_;
             bool isChild_;
+
+            //Keep track of player kills
+            int killCount_;
 
             
 

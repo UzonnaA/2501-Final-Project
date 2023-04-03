@@ -5,11 +5,16 @@
 #include <SOIL/SOIL.h>
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <chrono>
 #include <thread>
 #include <string>
 #include <random>
 #include <path_config.h>
+
 
 #include "sprite.h"
 #include "particles.h"
@@ -28,6 +33,7 @@ const char *window_title_g = "Game Demo";
 const unsigned int window_width_g = 800;
 const unsigned int window_height_g = 600;
 const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
+bool UI_on = false;
 
 // Directory with game resources such as textures
 const std::string resources_directory_g = RESOURCES_DIRECTORY;
@@ -96,6 +102,20 @@ void Game::Init(void)
 
     // Initialize time
     current_time_ = 0.0;
+
+
+    //ImGui initialization code
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGui_ImplGlfw_InitForOpenGL(window_, true);
+    ImGui_ImplOpenGL3_Init();
+
+
+
+
+
 }
 
 
@@ -227,6 +247,11 @@ void Game::MainLoop(void)
     double last_time = glfwGetTime();
     while (!glfwWindowShouldClose(window_)){
 
+
+        
+
+
+
         // Clear background
         glClearColor(viewport_background_color_g.r,
                      viewport_background_color_g.g,
@@ -241,15 +266,40 @@ void Game::MainLoop(void)
         double current_time = glfwGetTime();
         double delta_time = current_time - last_time;
         last_time = current_time;
-
         // Update other events like input handling
         glfwPollEvents();
 
         // Update the game
         Update(view_matrix, delta_time);
 
+        if (UI_on) {
+            //Start UI
+            //Start a new ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            //Text Demo
+            std::string text = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
+            ImGui::Text(text.c_str());
+
+            //Render the ImGui frame
+            ImGui::Render();
+            int display_w, display_h;
+            glfwGetFramebufferSize(window_, &display_w, &display_h);
+            glViewport(0, 0, display_w, display_h);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            //End UI
+        }
+
+
+       
+
         // Push buffer drawn in the background onto the display
         glfwSwapBuffers(window_);
+
     }
 }
 
@@ -378,7 +428,11 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                         //We landed a hit in the current time frame
                         current_game_object->Kill();
                         other_game_object->Kill();
+                        
+                        game_objects_[0]->IncrementKillCount();
+
                         std::cout << "Enemy ship shot down!" << std::endl;
+                        std::cout << "Player Kills: " + std::to_string(game_objects_[0]->GetKillCount()) << std::endl;
                     }
 
 
@@ -397,6 +451,10 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
         // Render game object
         current_game_object->Render(view_matrix, current_time_);
     }
+
+
+    
+
 }
 
 
@@ -415,8 +473,9 @@ void Game::Controls(double delta_time)
     float motion_increment = 0.001*speed;
     float angle_increment = (glm::pi<float>() / 1800.0f)*speed;
 
-    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time;
+    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time, last_tab_time;
     static bool first_bullet = true;
+    static bool first_tab = true;
 
     // Check for player input and make changes accordingly
     if (glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS) {
@@ -424,6 +483,18 @@ void Game::Controls(double delta_time)
     }
     if (glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS) {
         player->SetPosition(curpos - motion_increment*dir);
+    }
+    if (glfwGetKey(window_, GLFW_KEY_TAB) == GLFW_PRESS) {
+        //Make it so you can only tab once every 1s
+        current_time = std::chrono::system_clock::now();
+
+        if (first_tab || current_time > last_tab_time + std::chrono::milliseconds(250)) {
+            UI_on = !UI_on;
+
+            last_tab_time = std::chrono::system_clock::now();
+            first_tab = false;
+        }
+
     }
     if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
         player->SetAngle(angle - angle_increment);

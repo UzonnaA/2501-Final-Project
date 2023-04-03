@@ -30,6 +30,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     death_time_ = current_time_ + std::chrono::seconds(5);
     parent_ = nullptr;
     isChild_ = false;
+    killCount_ = 0;
     
 
    

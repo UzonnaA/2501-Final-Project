@@ -15,6 +15,17 @@ set(HDRS
     sprite.h
     particles.h
     particle_system.h
+    imconfig.h
+    imgui.h
+    imgui_internal.h
+    imstb_rectpack.h
+    imstb_textedit.h
+    imstb_truetype.h
+    imgui_impl_opengl3_loader.h
+    imgui_impl_glfw.h
+    imgui_impl_opengl2.h
+    imgui_impl_opengl3.h
+
 )
  
 set(SRCS
@@ -27,12 +38,20 @@ set(SRCS
     sprite.cpp
     particles.cpp
     particle_system.cpp
+    imgui.cpp
+    imgui_demo.cpp
+    imgui_draw.cpp
+    imgui_tables.cpp
+    imgui_widgets.cpp
     sprite_vertex_shader.glsl
     sprite_fragment_shader.glsl
     particle_vertex_shader.glsl
     particle_fragment_shader.glsl
     particle_fragment_2.glsl
     particle_vertex_2.glsl
+    imgui_impl_glfw.cpp
+    imgui_impl_opengl2.cpp
+    imgui_impl_opengl3.cpp
 )
 
 # Add path name to configuration file
