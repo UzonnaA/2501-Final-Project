@@ -21,6 +21,10 @@ set(HDRS
     imstb_rectpack.h
     imstb_textedit.h
     imstb_truetype.h
+    imgui_impl_opengl3_loader.h
+    imgui_impl_glfw.h
+    imgui_impl_opengl2.h
+    imgui_impl_opengl3.h
 
 )
  
@@ -45,6 +49,9 @@ set(SRCS
     particle_fragment_shader.glsl
     particle_fragment_2.glsl
     particle_vertex_2.glsl
+    imgui_impl_glfw.cpp
+    imgui_impl_opengl2.cpp
+    imgui_impl_opengl3.cpp
 )
 
 # Add path name to configuration file

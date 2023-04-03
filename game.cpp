@@ -5,12 +5,16 @@
 #include <SOIL/SOIL.h>
 #include <iostream>
 
+#include "imgui.h"
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl2.h>
 
 #include <chrono>
 #include <thread>
 #include <string>
 #include <random>
 #include <path_config.h>
+
 
 #include "sprite.h"
 #include "particles.h"
@@ -97,6 +101,15 @@ void Game::Init(void)
 
     // Initialize time
     current_time_ = 0.0;
+
+
+    // ImGui initialization code
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL2_Init();
+
 }
 
 
