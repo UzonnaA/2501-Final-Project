@@ -279,6 +279,8 @@ void Game::MainLoop(void)
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            
+
             //Text Demo
             std::string text = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
             ImGui::Text(text.c_str());
@@ -286,6 +288,7 @@ void Game::MainLoop(void)
             //You can just call Text again to add more text to the GUI
             //ImGui::Text(text.c_str());
 
+            
             //Render the ImGui frame
             ImGui::Render();
             int display_w, display_h;
@@ -491,7 +494,7 @@ void Game::Controls(double delta_time)
         //Make it so you can only tab once every 1s
         current_time = std::chrono::system_clock::now();
 
-        if (first_tab || current_time > last_tab_time + std::chrono::milliseconds(250)) {
+        if (first_tab || current_time > last_tab_time + std::chrono::milliseconds(300)) {
             UI_on = !UI_on;
 
             last_tab_time = std::chrono::system_clock::now();
