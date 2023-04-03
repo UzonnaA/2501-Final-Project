@@ -283,6 +283,9 @@ void Game::MainLoop(void)
             std::string text = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
             ImGui::Text(text.c_str());
 
+            //You can just call Text again to add more text to the GUI
+            //ImGui::Text(text.c_str());
+
             //Render the ImGui frame
             ImGui::Render();
             int display_w, display_h;
