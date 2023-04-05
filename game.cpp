@@ -371,7 +371,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
     // Handle user input
     Controls(delta_time);
 
-    
+    glm::vec3 playerPos = dynamic_cast<PlayerGameObject*>(game_objects_[0])->GetPosition();
 
     // Update and render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
@@ -383,6 +383,10 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
 
         // Get the current game object
         GameObject* current_game_object = game_objects_[i];
+
+        if (current_game_object->GetType() == "enemy") {
+            current_game_object->SetPlayer(playerPos);
+        }
 
         // Update the current game object
         current_game_object->Update(delta_time);
@@ -423,10 +427,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
             The following code is for when the player makes contact with any enemy type objects.
 
             Current Issues:
-            - Doesn't delete blades and particles
-            - Doesnt display "Game Over!" screen
-            - Doesnt close window
-            - If enemies spawn on the player, he immediately loses 1 health.
+            - Weird camera issue when player object is erased?
 
             */
             if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "enemy")) {
@@ -434,14 +435,12 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                 if (distance < 1.0f) {
                     
                     current_game_object->TakeDamage(1);
-                    game_objects_.erase(game_objects_.begin() + j);
+                    other_game_object->Kill();
                     current_game_object->IncrementKillCount();
                     if (current_game_object->GetHealth() <= 0) {
-                        game_objects_.erase(game_objects_.begin() + i);
-                        //Delete blades and particles
-                        //Display Game Over screen
-                        //Wait a couple sec
-                        //Delete window
+                        current_game_object->Kill();
+                        glfwSetWindowShouldClose(window_, true);
+
                     }
                 }
             }
@@ -572,6 +571,7 @@ void Game::Controls(double delta_time)
         //Call update
         current_time = std::chrono::system_clock::now();
 
+        //if(player->GetWeapon()=="bullet") {
         if (first_bullet || current_time > last_bullet_time + std::chrono::milliseconds(500)) {
             GameObject* bullet = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[5]);
             
@@ -601,6 +601,16 @@ void Game::Controls(double delta_time)
 
 
         }
+        //}
+
+        //if(player->GetWeapon()=="aoe") {
+        
+        //}
+
+        //if(player->GetWeapon()=="undecided") {
+        
+        //}
+        
 
         
     }

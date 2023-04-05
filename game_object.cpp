@@ -82,6 +82,38 @@ void GameObject::SetAngle(float angle){
 
 void GameObject::Update(double delta_time) {
 
+    if (this->GetType() == "enemy") {
+        //Calculate the distance from enemy to player
+        float distance = glm::distance(position_, player_pos_);
+        const float attack_range = 2.0f;
+
+        //If they are too close, attack them
+        //Otherwise patrol
+        if (distance <= attack_range) {
+            state_ = 1;
+        }
+        else {
+            state_ = 0;
+        }
+
+        //State 0 is patrol
+        //Uses a parametric equation to move in a slow circle
+        if (state_ == 0) {
+            angle_ += speed_ * delta_time;
+            float x = centre_.x + (radius_ * cos(angle_));
+            float y = centre_.y + (radius_ * sin(angle_));
+
+            position_ = glm::vec3(x, y, 0.0f);
+        }
+
+        //State 1 is move
+        //Moves in the direction of the given player position
+        if (state_ == 1) {
+            glm::vec3 direction = player_pos_ - position_;
+            direction = glm::normalize(direction);
+            position_ += glm::vec3(direction.x * 0.5f * delta_time, direction.y * 0.5f * delta_time, 0.0f);
+        }
+    }
     // Update object position with Euler integration
     position_ += velocity_ * ((float) delta_time);
     current_time_ = std::chrono::system_clock::now();
@@ -141,7 +173,7 @@ void GameObject::UpdateEnemy(double delta_time) {           //  This entire func
 
 
     // Call the parent's update method to move the object in standard way, if desired
-    Update(delta_time);
+    GameObject::Update(delta_time);
 }
 
 
