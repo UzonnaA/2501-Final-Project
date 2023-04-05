@@ -190,6 +190,7 @@ void Game::Setup(void)
     // last object
     GameObject *background = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[3]);
     background->SetScale(10.0);
+    background->SetIsBg(true);
     game_objects_.push_back(background);
 
     // Setup particle system
@@ -415,17 +416,41 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
 
             // Compute distance between object i and object j
             float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
-            // If distance is below a threshold, we have a collision
-            if (distance < 0.8f) {
-                // This is where you would perform collision response between objects
-            }
+            
+           
 
+            /*
+            The following code is for when the player makes contact with any enemy type objects.
+
+            Current Issues:
+            - Doesn't delete blades and particles
+            - Doesnt display "Game Over!" screen
+            - Doesnt close window
+            - If enemies spawn on the player, he immediately loses 1 health.
+
+            */
+            if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "enemy")) {
+                float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
+                if (distance < 1.0f) {
+                    
+                    current_game_object->TakeDamage(1);
+                    game_objects_.erase(game_objects_.begin() + j);
+                    current_game_object->IncrementKillCount();
+                    if (current_game_object->GetHealth() <= 0) {
+                        game_objects_.erase(game_objects_.begin() + i);
+                        //Delete blades and particles
+                        //Display Game Over screen
+                        //Wait a couple sec
+                        //Delete window
+                    }
+                }
+            }
 
             //Above is for normal collision, below will be RayCollision
             
             glm::vec3 center = other_game_object->GetPosition();
             //Just guessing the radius for now, not sure what is actually is yet
-            float radius = 0.5f;
+            float radius = other_game_object->GetRadius();
 
             if (other_game_object->GetType() == "enemy") {
                 isEnemy = true;

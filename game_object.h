@@ -38,12 +38,13 @@ namespace game {
             inline int GetKillCount(void) { return killCount_; }
             inline int GetHealth(void) { return health_; }
             inline float GetAngle(void) { return angle_; }
+            inline float GetRadius(void) { return radius_; }
             inline glm::vec3& GetVelocity(void) { return velocity_; }
             inline bool CheckDead(void) { return isDead_; }
             inline bool CheckMustDie(void) { return mustDie_; }
             inline bool CheckIfChild(void) { return isChild_; }
             inline std::string GetType(void) { return type_; }
-
+            inline bool isBackground(void) { return isBg_; }
             // Get bearing direction (direction in which the game object
             // is facing)
             glm::vec3 GetBearing(void);
@@ -67,6 +68,7 @@ namespace game {
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
             inline void SetMustDie(bool die) { mustDie_ = die; }
             inline void IncrementKillCount(void) { killCount_ += 1; }
+            inline void SetIsBg(bool isBg) { isBg_ = isBg; }
             
             
             inline void SetType(std::string type) { 
@@ -85,6 +87,14 @@ namespace game {
             }
 
             inline void Kill() { isDead_ = true; }
+
+            //for enemy
+            //Getters
+            inline int GetMovement(void) { return state_; }
+            //Setter
+            inline void SetMovement(int state) { state_ = state; }
+            inline void SetPlayer(glm::vec3 player) { player_pos_ = player; }
+            void UpdateEnemy(double delta_time);
 
         protected:
             // Object's Transform Variables
@@ -121,6 +131,16 @@ namespace game {
 
             //Keep track of health
             int health_;
+
+            //for enemy
+            int state_;
+            float radius_;
+            float speed_;
+            glm::vec3 centre_;
+            glm::vec3 player_pos_;
+
+            //for bg
+            bool isBg_;
 
             
 
