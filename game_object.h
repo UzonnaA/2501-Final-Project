@@ -66,7 +66,15 @@ namespace game {
             inline void SetScale(float scale) { scale_ = scale; }
             void SetAngle(float angle);
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
-            inline void SetMustDie(bool die) { mustDie_ = die; }
+            
+            //If you are turnig off must die for some weird reason
+            //the value of time doesn't matter
+            inline void SetMustDie(bool die, int time) { 
+                mustDie_ = die;
+                current_time_ = std::chrono::system_clock::now();
+                death_time_ = current_time_ + std::chrono::seconds(time);
+            }
+
             inline void IncrementKillCount(void) { killCount_ += 1; }
             inline void SetIsBg(bool isBg) { isBg_ = isBg; }
             
@@ -116,6 +124,7 @@ namespace game {
             //This will check if the GO should be destroyed
             bool isDead_;
             bool mustDie_;
+            
 
            
 

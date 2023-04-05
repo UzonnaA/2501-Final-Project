@@ -26,9 +26,12 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     isBg_ = false;  //to distinguish background easily
     mustDie_ = false;
     current_time_ = std::chrono::system_clock::now();
-    //I could change SetMustDie to accept an int and always change mustDie to true
-    //Doesn't mean I will but I totally could
-    death_time_ = current_time_ + std::chrono::seconds(5);
+    
+    //I set this to the really high value of 100, but in reality
+    //the code always forces you to change it anyway
+    //No, this does not mean everything will delete after 100s
+    //read the code
+    death_time_ = current_time_ + std::chrono::seconds(100);
     parent_ = nullptr;
     isChild_ = false;
     killCount_ = 0;
@@ -137,44 +140,7 @@ void GameObject::Update(double delta_time) {
   
 }
 
-void GameObject::UpdateEnemy(double delta_time) {           //  This entire function is just for enemy behaviours. Currently not working.
 
-    //Calculate the distance from enemy to player
-    float distance = glm::distance(position_, player_pos_);
-    const float attack_range = 2.0f;
-
-    //If they are too close, attack them
-    //Otherwise patrol
-    if (distance <= attack_range) {
-        state_ = 1;
-    }
-    else {
-        state_ = 0;
-    }
-
-    //State 0 is patrol
-    //Uses a parametric equation to move in a slow circle
-    if (state_ == 0) {
-        angle_ += speed_ * delta_time;
-        float x = centre_.x + (radius_ * cos(angle_));
-        float y = centre_.y + (radius_ * sin(angle_));
-
-        position_ = glm::vec3(x, y, 0.0f);
-    }
-
-    //State 1 is move
-    //Moves in the direction of the given player position
-    if (state_ == 1) {
-        glm::vec3 direction = player_pos_ - position_;
-        direction = glm::normalize(direction);
-        position_ += glm::vec3(direction.x * 0.5f * delta_time, direction.y * 0.5f * delta_time, 0.0f);
-    }
-    // Special player updates go here
-
-
-    // Call the parent's update method to move the object in standard way, if desired
-    GameObject::Update(delta_time);
-}
 
 
 void GameObject::Render(glm::mat4 view_matrix, double current_time){

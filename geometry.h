@@ -18,6 +18,9 @@ namespace game {
 
             // Use the geometry
             virtual void SetGeometry(GLuint shader_program) {};
+            
+            //set the particle effect to use explosion code
+            inline void SetExplode(bool temp) { isExplosion_ = temp; }
 
             // Getter
             int GetSize(void) { return size_; }
@@ -30,6 +33,7 @@ namespace game {
             GLuint ebo_;
             int size_;
             float range_;
+            bool isExplosion_;
 
     }; // class Geometry
 } // namespace game

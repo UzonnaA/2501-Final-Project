@@ -480,7 +480,22 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                     if (glm::dot(bullet_to_enemy_direction, bullet_direction) >= 0 && bullet_to_enemy_distance <= bullet_distance + enemy_radius) {
                         //We landed a hit in the current time frame
                         current_game_object->Kill();
-                        other_game_object->Kill();
+
+                        //Other game object is the enemy
+                        //I plan on creating an explosion particle effect and stuff
+
+                        // Setup particle system
+                        particles3_ = new Particles();
+                        particles3_->SetExplode(true);
+                        particles3_->CreateGeometry();
+                        GameObject* particles = new ParticleSystem(glm::vec3(0.0f, 0.0f, 0.0f), particles3_, &particle_shader_, tex_[4], other_game_object);
+                        particles->SetScale(0.2);
+                        game_objects_.push_back(particles);
+                        
+
+                        //This causes a bug where you can still hit a dead enemy since they don't actually despawn for 2s
+                        //I could set a flag that prevents this, but I'll do it later
+                        other_game_object->SetMustDie(true,2);
                         
                         game_objects_[0]->IncrementKillCount();
 
@@ -577,7 +592,7 @@ void Game::Controls(double delta_time)
             
 
             bullet->SetScale(0.5);
-            bullet->SetMustDie(true);
+            bullet->SetMustDie(true, 15);
             bullet->SetAngle(player->GetAngle());
             bullet->SetVelocity(5.0f * player->GetBearing());
             bullet->SetType("bullet");

@@ -39,6 +39,7 @@ namespace game {
             // Particle geometry
             Geometry *particles_;
             Geometry *particles2_;
+            Geometry* particles3_;
 
 
             // Shader for rendering sprites in the scene
