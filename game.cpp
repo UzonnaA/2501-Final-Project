@@ -371,7 +371,9 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
     // Handle user input
     Controls(delta_time);
 
+    //View matrix is updated to follow the player
     glm::vec3 playerPos = dynamic_cast<PlayerGameObject*>(game_objects_[0])->GetPosition();
+    view_matrix = glm::translate(view_matrix, -playerPos);
 
     // Update and render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
