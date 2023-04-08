@@ -39,6 +39,7 @@ namespace game {
             inline int GetHealth(void) { return health_; }
             inline float GetAngle(void) { return angle_; }
             inline float GetRadius(void) { return radius_; }
+            inline int GetWeaponType(void) { return weaponType_; }
             inline glm::vec3& GetVelocity(void) { return velocity_; }
             inline bool CheckDead(void) { return isDead_; }
             inline bool CheckMustDie(void) { return mustDie_; }
@@ -62,6 +63,14 @@ namespace game {
                 }
             }
 
+            inline void IncrementWeaponType() {
+                if (weaponType_ < 2) { //needs to become 3 when the last weapon is decided
+                    this->weaponType_++;
+                }
+                else if (weaponType_ >= 2) {
+                    this->weaponType_ = 1; //back to default weapon (which is bullet)
+                }
+            }
 
             inline void SetScale(float scale) { scale_ = scale; }
             void SetAngle(float angle);
@@ -147,6 +156,9 @@ namespace game {
             float speed_;
             glm::vec3 centre_;
             glm::vec3 player_pos_;
+
+            //for weapon
+            int weaponType_;
 
             //for bg
             bool isBg_;

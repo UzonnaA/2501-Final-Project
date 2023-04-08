@@ -44,6 +44,9 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     centre_ = position_;
     player_pos_ = glm::vec3(0.0f, 1.0f, 0.0f);
     angle_ = 0.0f;
+
+    //for weapon
+    weaponType_ = 1;
     
    
 }
@@ -136,11 +139,8 @@ void GameObject::Update(double delta_time) {
     if (type_ == "blade") {
         angle_ = angle_ + ((glm::pi<float>() / 500.0f) * (delta_time*900.0));
     }
-
   
 }
-
-
 
 
 void GameObject::Render(glm::mat4 view_matrix, double current_time){
