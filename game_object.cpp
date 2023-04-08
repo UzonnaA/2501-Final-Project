@@ -47,6 +47,9 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
 
     //for weapon
     weaponType_ = 1;
+
+    //for invincibility
+    ghost_ = false;
     
    
 }

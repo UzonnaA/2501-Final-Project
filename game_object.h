@@ -43,6 +43,7 @@ namespace game {
             inline glm::vec3& GetVelocity(void) { return velocity_; }
             inline bool CheckDead(void) { return isDead_; }
             inline bool CheckMustDie(void) { return mustDie_; }
+            inline bool CheckGhost(void) { return ghost_; }
             inline bool CheckIfChild(void) { return isChild_; }
             inline std::string GetType(void) { return type_; }
             inline bool isBackground(void) { return isBg_; }
@@ -86,6 +87,7 @@ namespace game {
 
             inline void IncrementKillCount(void) { killCount_ += 1; }
             inline void SetIsBg(bool isBg) { isBg_ = isBg; }
+            inline void SetGhost(bool ghost) { ghost_ = ghost; }
             
             
             inline void SetType(std::string type) { 
@@ -162,6 +164,10 @@ namespace game {
 
             //for bg
             bool isBg_;
+
+            //This will allow for a GameObject to become invincible
+            //I'm using this for enemies after they explode, but it will also work for the player
+            bool ghost_;
 
             
 

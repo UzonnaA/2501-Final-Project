@@ -403,6 +403,11 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
 
             continue;
         }
+
+        if (current_game_object->CheckGhost()) {
+            //if we're ghosted, stop collision
+            continue;
+        }
          
 
         //First we need the velocity of the bullet      /other projectile
@@ -428,6 +433,11 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
         for (int j = i + 1; j < (game_objects_.size()-1); j++) {
             GameObject* other_game_object = game_objects_[j];
             isEnemy = false;
+
+            if (other_game_object->CheckGhost()) {
+                //if we're ghosted, stop collision
+                continue;
+            }
 
             // Compute distance between object i and object j
             float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
@@ -500,13 +510,14 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                         particles3_ = new Particles();
                         particles3_->SetExplode(true);
                         particles3_->CreateGeometry();
-                        GameObject* particles = new ParticleSystem(glm::vec3(0.0f, 0.0f, 0.0f), particles3_, &particle_shader_, tex_[4], other_game_object);
+                        GameObject* particles = new ParticleSystem(glm::vec3(0.0f, 0.0f, 0.0f), particles3_, &particle_shader2_, tex_[4], other_game_object);
                         particles->SetScale(0.2);
                         game_objects_.push_back(particles);
                         
 
                         //This causes a bug where you can still hit a dead enemy since they don't actually despawn for 2s
                         //I could set a flag that prevents this, but I'll do it later
+                        other_game_object->SetGhost(true);
                         other_game_object->SetMustDie(true,2);
                         
                         game_objects_[0]->IncrementKillCount();
@@ -650,7 +661,7 @@ void Game::Controls(double delta_time)
                 GameObject* aoe = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[7]); //need to change texture 
 
                 aoe->SetScale(1.5);
-                aoe->SetMustDie(true);
+                aoe->SetMustDie(true, 15);
                 aoe->SetAngle(player->GetAngle());
                 aoe->SetVelocity(5.0f * player->GetBearing());
                 aoe->SetType("aoe");

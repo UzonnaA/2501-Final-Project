@@ -128,8 +128,8 @@ void Particles::CreateGeometry(void)
             // Set random initial position and velocity
             particles[i * vertex_attr + 0] = 0.0f; // x
             particles[i * vertex_attr + 1] = 0.0f; // y
-            particles[i * vertex_attr + 2] = (rand() % 10000) / 10000.0f - 0.5f; // vx
-            particles[i * vertex_attr + 3] = (rand() % 10000) / 10000.0f - 0.5f; // vy
+            particles[i * vertex_attr + 2] = (rand() % 10000) / 20000.0f - 0.25f; // vx
+            particles[i * vertex_attr + 3] = (rand() % 10000) / 20000.0f - 0.25f; // vy
 
             // Set random lifetime
             particles[i * vertex_attr + 4] = (rand() % 10000) / 10000.0f; // t
