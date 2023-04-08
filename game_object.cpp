@@ -26,9 +26,12 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     isBg_ = false;  //to distinguish background easily
     mustDie_ = false;
     current_time_ = std::chrono::system_clock::now();
-    //I could change SetMustDie to accept an int and always change mustDie to true
-    //Doesn't mean I will but I totally could
-    death_time_ = current_time_ + std::chrono::seconds(5);
+    
+    //I set this to the really high value of 100, but in reality
+    //the code always forces you to change it anyway
+    //No, this does not mean everything will delete after 100s
+    //read the code
+    death_time_ = current_time_ + std::chrono::seconds(100);
     parent_ = nullptr;
     isChild_ = false;
     killCount_ = 0;

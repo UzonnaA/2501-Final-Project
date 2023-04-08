@@ -13,90 +13,155 @@ Particles::Particles(void) : Geometry()
     ebo_ = 0;
     size_ = 0;
     range_ = 0.13f;
+    isExplosion_ = false;
 }
+
+
 
 
 void Particles::CreateGeometry(void)
 {
-
-    // Each particle is a square with four vertices and two triangles
+    if (!isExplosion_) {
+        // Each particle is a square with four vertices and two triangles
 
     // Number of attributes for vertices and faces
-    const int vertex_attr = 7;  // 7 attributes per vertex: 2D (or 3D) position (2), direction (2), 2D texture coordinates (2), time (1)
-                                //    const int face_att = 3; // Vertex indices (3)
+        const int vertex_attr = 7;  // 7 attributes per vertex: 2D (or 3D) position (2), direction (2), 2D texture coordinates (2), time (1)
+                                    //    const int face_att = 3; // Vertex indices (3)
 
-    // Vertices
-    GLfloat vertex[]  = {
-        // Four vertices of a square
-        // Position      Color                Texture coordinates
-        -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    0.0f, 0.0f, // Top-left
-         0.5f,  0.5f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // Top-right
-         0.5f, -0.5f,    0.0f, 0.0f, 1.0f,    1.0f, 1.0f, // Bottom-right
-        -0.5f, -0.5f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f  // Bottom-left
-    };
+        // Vertices
+        GLfloat vertex[] = {
+            // Four vertices of a square
+            // Position      Color                Texture coordinates
+            -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    0.0f, 0.0f, // Top-left
+             0.5f,  0.5f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // Top-right
+             0.5f, -0.5f,    0.0f, 0.0f, 1.0f,    1.0f, 1.0f, // Bottom-right
+            -0.5f, -0.5f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f  // Bottom-left
+        };
 
-    // Two triangles referencing the vertices
-    GLuint face[] = {
-        0, 1, 2, // t1
-        2, 3, 0  // t2
-    };
+        // Two triangles referencing the vertices
+        GLuint face[] = {
+            0, 1, 2, // t1
+            2, 3, 0  // t2
+        };
 
-    // Initialize all the particle vertices
-    GLfloat particles[NUM_PARTICLES * vertex_attr];
-    float theta, r, tmod;
-    float pi = glm::pi<float>();
-    float two_pi = 2.0f*pi;
+        // Initialize all the particle vertices
+        GLfloat particles[NUM_PARTICLES * vertex_attr];
+        float theta, r, tmod;
+        float pi = glm::pi<float>();
+        float two_pi = 2.0f * pi;
 
-    for (int i = 0; i < NUM_PARTICLES; i++){
-        // Check if we are initializing a new particle
-        //
-        // A particle has four vertices, so every four vertices we need
-        // to initialize new random values
-        if (i % 4 == 0){
-            // Get three random values
-            //theta = (two_pi*(rand() % 1000) / 1000.0f);
-            theta = (2.0*(rand() % 10000) / 10000.0f -1.0f)*range_ + pi;
-            r = 0.0f + 0.8*(rand() % 10000) / 10000.0f;
-            tmod = (rand() % 10000) / 10000.0f;
+        for (int i = 0; i < NUM_PARTICLES; i++) {
+            // Check if we are initializing a new particle
+            //
+            // A particle has four vertices, so every four vertices we need
+            // to initialize new random values
+            if (i % 4 == 0) {
+                // Get three random values
+                //theta = (two_pi*(rand() % 1000) / 1000.0f);
+                theta = (2.0 * (rand() % 10000) / 10000.0f - 1.0f) * range_ + pi;
+                r = 0.0f + 0.8 * (rand() % 10000) / 10000.0f;
+                tmod = (rand() % 10000) / 10000.0f;
+            }
+
+            // Copy position from standard sprite
+            particles[i * vertex_attr + 0] = vertex[(i % 4) * 7 + 0];
+            particles[i * vertex_attr + 1] = vertex[(i % 4) * 7 + 1];
+
+            // Set direction based on random values
+            particles[i * vertex_attr + 2] = sin(theta) * r;
+            particles[i * vertex_attr + 3] = cos(theta) * r;
+
+            // Set phase based on random values
+            particles[i * vertex_attr + 4] = tmod;
+
+            // Copy texture coordinates from standard sprite
+            particles[i * vertex_attr + 5] = vertex[(i % 4) * 7 + 5];
+            particles[i * vertex_attr + 6] = vertex[(i % 4) * 7 + 6];
         }
 
-        // Copy position from standard sprite
-        particles[i*vertex_attr + 0] = vertex[(i % 4) * 7 + 0];
-        particles[i*vertex_attr + 1] = vertex[(i % 4) * 7 + 1];
+        // Initialize all the particle faces
+        GLuint manyfaces[NUM_PARTICLES * 6];
 
-        // Set direction based on random values
-        particles[i*vertex_attr + 2] = sin(theta)*r;
-        particles[i*vertex_attr + 3] = cos(theta)*r;
-
-        // Set phase based on random values
-        particles[i*vertex_attr + 4] = tmod;
-
-        // Copy texture coordinates from standard sprite
-        particles[i*vertex_attr + 5] = vertex[(i % 4) * 7 + 5];
-        particles[i*vertex_attr + 6] = vertex[(i % 4) * 7 + 6];
-    }
-
-    // Initialize all the particle faces
-    GLuint manyfaces[NUM_PARTICLES * 6];
-
-    for (int i = 0; i < NUM_PARTICLES; i++) {
-        for (int j = 0; j < 6; j++){
-            manyfaces[i * 6 + j] = face[j] + i * 4;
+        for (int i = 0; i < NUM_PARTICLES; i++) {
+            for (int j = 0; j < 6; j++) {
+                manyfaces[i * 6 + j] = face[j] + i * 4;
+            }
         }
+
+        // Create buffer for vertices
+        glGenBuffers(1, &vbo_);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_STATIC_DRAW);
+
+        // Create buffer for faces (index buffer)
+        glGenBuffers(1, &ebo_);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(manyfaces), manyfaces, GL_STATIC_DRAW);
+
+        // Set number of elements in array buffer
+        size_ = sizeof(manyfaces) / sizeof(GLuint);
+    }
+    else {
+        // Number of attributes for vertices and faces
+        const int vertex_attr = 7;
+
+        // Vertices of a particle
+        GLfloat vertex[] = {
+            // Position      Color                Texture coordinates
+            -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,    0.0f, 0.0f, // Top-left
+             0.5f,  0.5f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // Top-right
+             0.5f, -0.5f,    0.0f, 0.0f, 1.0f,    1.0f, 1.0f, // Bottom-right
+            -0.5f, -0.5f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f  // Bottom-left
+        };
+
+        // Indices of a particle
+        GLuint face[] = {
+            0, 1, 2,
+            2, 3, 0
+        };
+
+        // Initialize all the particle vertices and indices
+        GLfloat particles[NUM_PARTICLES * vertex_attr];
+        GLuint indices[NUM_PARTICLES * 6];
+
+        for (int i = 0; i < NUM_PARTICLES; i++) {
+            // Set random initial position and velocity
+            particles[i * vertex_attr + 0] = 0.0f; // x
+            particles[i * vertex_attr + 1] = 0.0f; // y
+            particles[i * vertex_attr + 2] = (rand() % 10000) / 10000.0f - 0.5f; // vx
+            particles[i * vertex_attr + 3] = (rand() % 10000) / 10000.0f - 0.5f; // vy
+
+            // Set random lifetime
+            particles[i * vertex_attr + 4] = (rand() % 10000) / 10000.0f; // t
+
+            // Copy texture coordinates from standard sprite
+            particles[i * vertex_attr + 5] = vertex[(i % 4) * 7 + 5];
+            particles[i * vertex_attr + 6] = vertex[(i % 4) * 7 + 6];
+
+            // Set indices for this particle
+            GLuint offset = i * 4;
+            for (int j = 0; j < 6; j++) {
+                indices[i * 6 + j] = face[j] + offset;
+            }
+        }
+
+        // Create buffer for vertices
+        glGenBuffers(1, &vbo_);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_STATIC_DRAW);
+
+        // Create buffer for indices (element buffer)
+        glGenBuffers(1, &ebo_);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // Set number of elements in element buffer
+        size_ = sizeof(indices) / sizeof(GLuint);
     }
 
-    // Create buffer for vertices
-    glGenBuffers(1, &vbo_);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_STATIC_DRAW);
+    
 
-    // Create buffer for faces (index buffer)
-    glGenBuffers(1, &ebo_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(manyfaces), manyfaces, GL_STATIC_DRAW);
-
-    // Set number of elements in array buffer
-    size_ = sizeof(manyfaces) / sizeof(GLuint);
+    
 }
 
 

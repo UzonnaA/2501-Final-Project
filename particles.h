@@ -19,6 +19,7 @@ namespace game {
             // Use the geometry
             void SetGeometry(GLuint shader_program);
 
+
             
 
     }; // class Particles
