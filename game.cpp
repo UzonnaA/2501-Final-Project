@@ -240,6 +240,7 @@ void Game::SetAllTextures(void)
     SetTexture(tex_[4], (resources_directory_g+std::string("/textures/orb.png")).c_str());
     SetTexture(tex_[5], (resources_directory_g + std::string("/textures/bullet.png")).c_str());
     SetTexture(tex_[6], (resources_directory_g + std::string("/textures/blade.png")).c_str());
+    SetTexture(tex_[7], (resources_directory_g + std::string("/textures/aoeSprite.png")).c_str());  //need to change texture
     glBindTexture(GL_TEXTURE_2D, tex_[0]);
 }
 
@@ -376,15 +377,15 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
     // Update and render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
 
-        //These bools will ensure we only deal with bullets and enemies
+        //These bools will ensure we only deal with bullets, aoe and enemies
         bool isBullet = false;
         bool isEnemy = false;
-
+        bool isAoe = false;
 
         // Get the current game object
         GameObject* current_game_object = game_objects_[i];
 
-        if (current_game_object->GetType() == "enemy") {
+        if (current_game_object->GetType() == "enemy") {    //for enemy states
             current_game_object->SetPlayer(playerPos);
         }
 
@@ -402,7 +403,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
         }
          
 
-        //First we need the velocity of the bullet
+        //First we need the velocity of the bullet      /other projectile
         glm::vec3 direction = current_game_object->GetVelocity();
         direction = glm::normalize(direction);
 
@@ -410,6 +411,14 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
             isBullet = true;
             //std::cout << current_game_object->GetType() << std::endl;
         }
+
+        if (current_game_object->GetType() == "aoe") {
+            isAoe = true;
+        }
+
+        //if (current_game_object->GetType() == "aoe") {
+            //isAoe = true;
+        //}
 
         // Check for collision with other game objects
         // Note the loop bounds: we avoid testing the last object since
@@ -455,7 +464,8 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                 isEnemy = true;
             }
 
-            if (isEnemy && isBullet) {
+            if (isEnemy && (isBullet||isAoe)) { //updated so collision works with both bullet and aoe atk
+
                 if (RayCollision(current_game_object->GetPosition(), direction, center, radius)) {
                     //If I get this far, that means a bullet will eventually hit an enemy
                     //Now we check if the bullet is CURRENTLY HITTING an enemy
@@ -526,8 +536,11 @@ void Game::Controls(double delta_time)
     float motion_increment = 0.001*speed;
     float angle_increment = (glm::pi<float>() / 1800.0f)*speed;
 
-    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time, last_tab_time;
+    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time, last_tab_time, last_aoe_time, last_switch_time;    //edited to also have aoe and weapon switch
     static bool first_bullet = true;
+    static bool first_aoe = true;
+    static bool first_switch = true;
+
     static bool first_tab = true;
 
     // Check for player input and make changes accordingly
@@ -564,6 +577,19 @@ void Game::Controls(double delta_time)
     if (glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window_, true);
     }
+
+    if (glfwGetKey(window_, GLFW_KEY_R) == GLFW_PRESS) {    //makes it so you can only switch every 600ms
+        
+        current_time = std::chrono::system_clock::now();
+
+        if (first_switch || current_time > last_switch_time + std::chrono::milliseconds(600)) {
+            player->IncrementWeaponType();
+
+            last_switch_time = std::chrono::system_clock::now();
+            first_switch = false;
+        }
+    }
+
     if (glfwGetKey(window_, GLFW_KEY_F) == GLFW_PRESS) {
         //Create a bullet
         //Edit all of its properties so it fires correctly
@@ -571,43 +597,62 @@ void Game::Controls(double delta_time)
         //Call update
         current_time = std::chrono::system_clock::now();
 
-        //if(player->GetWeapon()=="bullet") {
-        if (first_bullet || current_time > last_bullet_time + std::chrono::milliseconds(500)) {
-            GameObject* bullet = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[5]);
-            
-
-            bullet->SetScale(0.5);
-            bullet->SetMustDie(true);
-            bullet->SetAngle(player->GetAngle());
-            bullet->SetVelocity(5.0f * player->GetBearing());
-            bullet->SetType("bullet");
+        if (player->GetWeaponType() == 1) {
+            if (first_bullet || current_time > last_bullet_time + std::chrono::milliseconds(500)) {
+                GameObject* bullet = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[5]);
 
 
-            
-            game_objects_.insert(game_objects_.begin() + 1, bullet);
+                bullet->SetScale(0.5);
+                bullet->SetMustDie(true);
+                bullet->SetAngle(player->GetAngle());
+                bullet->SetVelocity(5.0f * player->GetBearing());
+                bullet->SetType("bullet");
 
 
-            // Setup particle system
-            GameObject* particles = new ParticleSystem(glm::vec3(0.0f, -0.3f, 0.0f), particles2_, &particle_shader2_, tex_[4], game_objects_[1]);
-            particles->SetScale(0.2);
-            game_objects_.push_back(particles);
 
-            //std::cout << "BULLET FIRED" << std::endl;
-
-            bullet->Update(delta_time);
-
-            last_bullet_time = std::chrono::system_clock::now();
-            first_bullet = false;
+                game_objects_.insert(game_objects_.begin() + 1, bullet);
 
 
+                // Setup particle system
+                GameObject* particles = new ParticleSystem(glm::vec3(0.0f, -0.3f, 0.0f), particles2_, &particle_shader2_, tex_[4], game_objects_[1]);
+                particles->SetScale(0.2);
+                game_objects_.push_back(particles);
+
+
+                //std::cout << "BULLET FIRED" << std::endl;
+
+                bullet->Update(delta_time);
+
+                last_bullet_time = std::chrono::system_clock::now();
+                first_bullet = false;
+
+
+            }
         }
-        //}
 
-        //if(player->GetWeapon()=="aoe") {
-        
-        //}
+        if (player->GetWeaponType() == 2) {         //sometimes edges of aoe sprite do not count as a connection
 
-        //if(player->GetWeapon()=="undecided") {
+            if (first_aoe || current_time > last_aoe_time + std::chrono::milliseconds(2000)) {
+                GameObject* aoe = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[7]); //need to change texture 
+
+                aoe->SetScale(1.5);
+                aoe->SetMustDie(true);
+                aoe->SetAngle(player->GetAngle());
+                aoe->SetVelocity(5.0f * player->GetBearing());
+                aoe->SetType("aoe");
+
+
+
+                game_objects_.insert(game_objects_.begin() + 1, aoe);
+
+                aoe->Update(delta_time);
+
+                last_aoe_time = std::chrono::system_clock::now();
+                first_aoe = false;
+            }
+        }
+
+        //if(player->GetWeaponType()==3) {
         
         //}
         
