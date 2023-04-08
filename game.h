@@ -63,6 +63,9 @@ namespace game {
             //It's probably easier to have a seperate function for collision
             bool RayCollision(glm::vec3 start, glm::vec3 direction, glm::vec3 center, float radius);
 
+            //New function for enemy spawning over time
+            void SpawnEnemies(glm::vec3 playerPos);
+
             // Callback for when the window is resized
             static void ResizeCallback(GLFWwindow* window, int width, int height);
 

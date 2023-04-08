@@ -121,7 +121,9 @@ void GameObject::Update(double delta_time) {
             glm::vec3 direction = player_pos_ - position_;
             direction = glm::normalize(direction);
             position_ += glm::vec3(direction.x * 0.5f * delta_time, direction.y * 0.5f * delta_time, 0.0f);
+            LookAtPlayer();
         }
+        
     }
     // Update object position with Euler integration
     position_ += velocity_ * ((float) delta_time);
@@ -143,6 +145,14 @@ void GameObject::Update(double delta_time) {
         angle_ = angle_ + ((glm::pi<float>() / 500.0f) * (delta_time*900.0));
     }
   
+}
+
+
+void GameObject::LookAtPlayer() {
+    glm::vec3 direction = player_pos_ - position_;
+    float angle = atan2(direction.y, direction.x);
+    angle -= glm::half_pi<float>();
+    SetAngle(angle);
 }
 
 

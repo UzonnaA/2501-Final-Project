@@ -8,6 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <string>
+#include <iostream>
 
 #include "shader.h"
 #include "geometry.h"
@@ -31,6 +32,7 @@ namespace game {
 
             // Renders the GameObject 
             virtual void Render(glm::mat4 view_matrix, double current_time);
+            void LookAtPlayer();
 
             // Getters
             inline glm::vec3& GetPosition(void) { return position_; }
@@ -56,11 +58,24 @@ namespace game {
 
             // Setters
             inline void SetPosition(const glm::vec3& position) {
+                glm::vec3 newPos = position;
+                
+                
+                if (type_ == "player") {
+                    if (newPos.x < -4.2f) {
+                        newPos.x = 4.2f;
+                    }
+                    if (newPos.x > 4.2f) {
+                        newPos.x = -4.2f;
+                    }
+                }
+                
+                
                 if (!isChild_) {
-                    position_ = position;
+                    position_ = newPos;
                 }
                 else {
-                    position_ = parent_->GetPosition() + position;
+                    position_ = parent_->GetPosition() + newPos;
                 }
             }
 

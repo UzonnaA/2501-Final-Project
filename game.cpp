@@ -30,8 +30,8 @@ namespace game {
 
 // Globals that define the OpenGL window and viewport
 const char *window_title_g = "Game Demo";
-const unsigned int window_width_g = 800;
-const unsigned int window_height_g = 600;
+const unsigned int window_width_g = 1100;
+const unsigned int window_height_g = 800;
 const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
 bool UI_on = false;
 static std::chrono::time_point<std::chrono::system_clock> game_start_time = std::chrono::system_clock::now();
@@ -152,23 +152,25 @@ void Game::Setup(void)
     //The x or y value of an object can be between (-3.5 to 3.5)
 
     //This code allows for a random value to be generated
-    std::random_device rand_device;
+    /*std::random_device rand_device;
     std::mt19937 spawn(rand_device());
-    std::uniform_real_distribution<> dis(-3.5, 3.5);
+    std::uniform_real_distribution<> dis(-3.5, 3.5);*/
 
 
     // Setup the player object (position, texture, vertex count)
     // Note that, in this specific implementation, the player object should always be the first object in the game object vector 
-    PlayerGameObject* player1 = new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[0]);
+    PlayerGameObject* player1 = new PlayerGameObject(glm::vec3(0.0f, -2.0f, 0.0f), sprite_, &sprite_shader_, tex_[0]);
+    player1->SetType("player");
     game_objects_.push_back(player1);
 
     // Setup other objects
 
-    for (int i = 0; i < 5; i++) {
+    /*for (int i = 0; i < 5; i++) {
         GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), dis(spawn), 0.0f), sprite_, &sprite_shader_, tex_[1]);
         enemy1->SetType("enemy");
         game_objects_.push_back(enemy1);
-    }
+        
+    }*/
 
     /*GameObject *enemy1 = new GameObject(glm::vec3(dis(spawn), dis(spawn), 0.0f), sprite_, &sprite_shader_, tex_[1]);
     enemy1->SetType("enemy");
@@ -273,6 +275,22 @@ void Game::MainLoop(void)
         // Update other events like input handling
         glfwPollEvents();
 
+
+        //Spawn the enemies
+        static std::chrono::time_point<std::chrono::system_clock> last_spawn_time, current_time2;
+        static bool first_wave = true;
+        current_time2 = std::chrono::system_clock::now();
+
+        if (first_wave || current_time2 > last_spawn_time + std::chrono::milliseconds(5000)) {
+            std::cout << "ENEMIES SPAWNED" << std::endl;
+            SpawnEnemies(game_objects_[0]->GetPosition());
+            first_wave = false;
+            last_spawn_time = std::chrono::system_clock::now();
+        }
+
+
+
+
         // Update the game
         Update(view_matrix, delta_time);
 
@@ -363,6 +381,22 @@ bool Game::RayCollision(glm::vec3 start, glm::vec3 direction, glm::vec3 center, 
 }
 
 
+void Game::SpawnEnemies(glm::vec3 playerPos) {
+    std::random_device rand_device;
+    std::mt19937 spawn(rand_device());
+    std::uniform_real_distribution<> dis(-3.5, 3.5);
+
+
+    for (int i = 0; i < 5; i++) {
+        GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 4.0f , 0.0f), sprite_, &sprite_shader_, tex_[1]);
+        enemy1->SetType("enemy");
+        game_objects_.insert(game_objects_.begin() + 1, enemy1);
+        
+    }
+
+}
+
+
 void Game::Update(glm::mat4 view_matrix, double delta_time)
 {
 
@@ -374,7 +408,18 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
 
     //View matrix is updated to follow the player
     glm::vec3 playerPos = dynamic_cast<PlayerGameObject*>(game_objects_[0])->GetPosition();
-    view_matrix = glm::translate(view_matrix, -playerPos);
+    glm::vec3 offset = glm::vec3(0.0f, 2.0f, 0.0f);
+    
+    //view_matrix = glm::translate(view_matrix, -playerPos - offset);
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, playerPos.y, 0.0f);
+    view_matrix = glm::translate(view_matrix, -cameraPos - offset);
+
+
+
+    
+
+
 
     // Update and render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
@@ -518,7 +563,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                         //This causes a bug where you can still hit a dead enemy since they don't actually despawn for 2s
                         //I could set a flag that prevents this, but I'll do it later
                         other_game_object->SetGhost(true);
-                        other_game_object->SetMustDie(true,2);
+                        other_game_object->SetMustDie(true,1);
                         
                         game_objects_[0]->IncrementKillCount();
 
@@ -591,10 +636,12 @@ void Game::Controls(double delta_time)
 
     }
     if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
-        player->SetAngle(angle - angle_increment);
+        //player->SetAngle(angle - angle_increment);
+        player->SetPosition(curpos + motion_increment * 2 * player->GetRight());
     }
     if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
-        player->SetAngle(angle + angle_increment);
+        //player->SetAngle(angle + angle_increment);
+        player->SetPosition(curpos - motion_increment * 2 * player->GetRight());
     }
     if (glfwGetKey(window_, GLFW_KEY_Z) == GLFW_PRESS) {
         player->SetPosition(curpos - motion_increment*player->GetRight());
@@ -602,8 +649,15 @@ void Game::Controls(double delta_time)
     if (glfwGetKey(window_, GLFW_KEY_C) == GLFW_PRESS) {
         player->SetPosition(curpos + motion_increment*player->GetRight());
     }
-    if (glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS) {
+    if (glfwGetKey(window_, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window_, true);
+    }
+    if (glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS) {
+        player->SetAngle(angle + angle_increment);
+        
+    }
+    if (glfwGetKey(window_, GLFW_KEY_E) == GLFW_PRESS) {
+        player->SetAngle(angle - angle_increment); 
     }
 
     if (glfwGetKey(window_, GLFW_KEY_R) == GLFW_PRESS) {    //makes it so you can only switch every 600ms
