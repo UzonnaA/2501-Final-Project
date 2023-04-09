@@ -615,6 +615,7 @@ void Game::Controls(double delta_time)
     static bool first_switch = true;
 
     static bool first_tab = true;
+    
 
     // Check for player input and make changes accordingly
     if (glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS) {
@@ -624,7 +625,7 @@ void Game::Controls(double delta_time)
         player->SetPosition(curpos - motion_increment*dir);
     }
     if (glfwGetKey(window_, GLFW_KEY_TAB) == GLFW_PRESS) {
-        //Make it so you can only tab once every 1s
+        //Make it so you can only tab once every 1s (ish)
         current_time = std::chrono::system_clock::now();
 
         if (first_tab || current_time > last_tab_time + std::chrono::milliseconds(300)) {
@@ -636,11 +637,14 @@ void Game::Controls(double delta_time)
 
     }
     if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
-        //player->SetAngle(angle - angle_increment);
+        
+        
         player->SetPosition(curpos + motion_increment * 2 * player->GetRight());
+        
     }
     if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
-        //player->SetAngle(angle + angle_increment);
+        
+        
         player->SetPosition(curpos - motion_increment * 2 * player->GetRight());
     }
     if (glfwGetKey(window_, GLFW_KEY_Z) == GLFW_PRESS) {
