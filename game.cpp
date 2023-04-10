@@ -165,7 +165,7 @@ void Game::Setup(void)
 
     // Setup other objects
 
-    /*for (int i = 0; i < 5; i++) {
+    /*for (int i = 0; i < 5; i++) {a
         GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), dis(spawn), 0.0f), sprite_, &sprite_shader_, tex_[1]);
         enemy1->SetType("enemy");
         game_objects_.push_back(enemy1);
@@ -191,7 +191,7 @@ void Game::Setup(void)
     // In this specific implementation, the background is always the
     // last object
     GameObject *background = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[3]);
-    background->SetScale(10.0);
+    background->SetScale(1000.0);
     background->SetIsBg(true);
     game_objects_.push_back(background);
 
@@ -222,8 +222,8 @@ void Game::SetTexture(GLuint w, const char *fname)
     SOIL_free_image_data(image);
 
     // Texture Wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Texture Filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -243,10 +243,11 @@ void Game::SetAllTextures(void)
     SetTexture(tex_[5], (resources_directory_g + std::string("/textures/bullet.png")).c_str());
     SetTexture(tex_[6], (resources_directory_g + std::string("/textures/blade.png")).c_str());
     SetTexture(tex_[7], (resources_directory_g + std::string("/textures/aoeSprite.png")).c_str());  //need to change texture
+    SetTexture(tex_[8], (resources_directory_g + std::string("/textures/minigun.png")).c_str());  //need to change texture
     glBindTexture(GL_TEXTURE_2D, tex_[0]);
 }
 
-
+int minigunAmmoCount = 0;   // global variable denoting the amount of ammo you minigun is currently holding
 void Game::MainLoop(void)
 {
     // Loop while the user did not close the window
@@ -320,9 +321,11 @@ void Game::MainLoop(void)
             //Menu Text
             std::string KillText = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
             std::string HealthText = "Current Health: " + std::to_string(game_objects_[0]->GetHealth());
+            std::string MinigunAmmoText = "Minigun Ammo: " + std::to_string((50 - minigunAmmoCount));
             ImGui::Text(time_str.c_str());
             ImGui::Text(HealthText.c_str());
             ImGui::Text(KillText.c_str());
+            ImGui::Text(MinigunAmmoText.c_str());
 
 
 
@@ -428,6 +431,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
         bool isBullet = false;
         bool isEnemy = false;
         bool isAoe = false;
+        bool isMini = false;
 
         // Get the current game object
         GameObject* current_game_object = game_objects_[i];
@@ -468,9 +472,9 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
             isAoe = true;
         }
 
-        //if (current_game_object->GetType() == "aoe") {
-            //isAoe = true;
-        //}
+        if (current_game_object->GetType() == "minigun") {
+            isMini = true;
+        }
 
         // Check for collision with other game objects
         // Note the loop bounds: we avoid testing the last object since
@@ -521,7 +525,7 @@ void Game::Update(glm::mat4 view_matrix, double delta_time)
                 isEnemy = true;
             }
 
-            if (isEnemy && (isBullet||isAoe)) { //updated so collision works with both bullet and aoe atk
+            if (isEnemy && (isBullet||isAoe||isMini)) { //updated so collision works with both bullet and aoe atk
 
                 if (RayCollision(current_game_object->GetPosition(), direction, center, radius)) {
                     //If I get this far, that means a bullet will eventually hit an enemy
@@ -608,10 +612,11 @@ void Game::Controls(double delta_time)
     float speed = delta_time*500.0;
     float motion_increment = 0.001*speed;
     float angle_increment = (glm::pi<float>() / 1800.0f)*speed;
-
-    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time, last_tab_time, last_aoe_time, last_switch_time;    //edited to also have aoe and weapon switch
+    //aaint minigunAmmoCount = 0;
+    static std::chrono::time_point<std::chrono::system_clock> current_time, last_bullet_time, last_tab_time, last_aoe_time, last_switch_time, last_minigun_time;    //edited to also have aoe and weapon switch
     static bool first_bullet = true;
     static bool first_aoe = true;
+    static bool first_minigun = true;
     static bool first_switch = true;
 
     static bool first_tab = true;
@@ -684,7 +689,7 @@ void Game::Controls(double delta_time)
         current_time = std::chrono::system_clock::now();
 
         if (player->GetWeaponType() == 1) {
-            if (first_bullet || current_time > last_bullet_time + std::chrono::milliseconds(500)) {
+            if (first_bullet || current_time > last_bullet_time + std::chrono::milliseconds(850)) {
                 GameObject* bullet = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[5]);
 
 
@@ -735,9 +740,29 @@ void Game::Controls(double delta_time)
             }
         }
 
-        //if(player->GetWeaponType()==3) {
-        
-        //}
+        if (player->GetWeaponType() == 3) {
+            if (first_minigun || current_time > last_minigun_time + std::chrono::milliseconds(200)) {
+                if (minigunAmmoCount <= 50) {
+                    GameObject* minigun = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[8]); //need to change texture 
+
+                    minigun->SetScale(.15);
+                    minigun->SetMustDie(true, 15);
+                    minigun->SetAngle(player->GetAngle());
+                    minigun->SetVelocity(5.0f * player->GetBearing());
+                    minigun->SetType("minigun");
+
+
+
+                    game_objects_.insert(game_objects_.begin() + 1, minigun);
+
+                    minigun->Update(delta_time);
+
+                    last_minigun_time = std::chrono::system_clock::now();
+                    first_minigun = false;
+                    minigunAmmoCount++;
+                }
+            }
+        }
         
 
         
