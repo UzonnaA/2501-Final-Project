@@ -123,6 +123,10 @@ void GameObject::Update(double delta_time) {
             position_ += glm::vec3(direction.x * 0.5f * delta_time, direction.y * 0.5f * delta_time, 0.0f);
             LookAtPlayer();
         }
+
+        if (state_ == 2) {
+
+        }
         
     }
     // Update object position with Euler integration
@@ -181,6 +185,13 @@ void GameObject::Render(glm::mat4 view_matrix, double current_time){
 
     // Set up the geometry
     geometry_->SetGeometry(shader_->GetShaderProgram());
+
+    if (this->isBg_ == true) {
+        shader_->SetUniform1f("x", 140.0);   //when it is a background the x value goes up so that the background doesnt look stretched and values are properly interpolated      
+    }
+    else {
+        shader_->SetUniform1f("x", 1.0);
+    }
 
     // Bind the entity's texture
     glBindTexture(GL_TEXTURE_2D, texture_);

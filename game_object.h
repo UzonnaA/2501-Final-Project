@@ -80,10 +80,10 @@ namespace game {
             }
 
             inline void IncrementWeaponType() {
-                if (weaponType_ < 2) { //needs to become 3 when the last weapon is decided
+                if (weaponType_ < 3) { 
                     this->weaponType_++;
                 }
-                else if (weaponType_ >= 2) {
+                else if (weaponType_ >= 3) {
                     this->weaponType_ = 1; //back to default weapon (which is bullet)
                 }
             }
