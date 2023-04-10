@@ -699,6 +699,10 @@ namespace game {
                 first_tab = false;
             }
 
+            if (game_is_over) {
+                UI_on = true;
+            }
+
         }
         if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
 
