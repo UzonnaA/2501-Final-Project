@@ -9,6 +9,7 @@
 #include <thread>
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "shader.h"
 #include "geometry.h"
@@ -33,6 +34,9 @@ namespace game {
             // Renders the GameObject 
             virtual void Render(glm::mat4 view_matrix, double current_time);
             void LookAtPlayer();
+
+            void InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec);
+            void Fire(double delta_time);
 
             // Getters
             inline glm::vec3& GetPosition(void) { return position_; }
@@ -150,12 +154,21 @@ namespace game {
             //This will check if the GO should be destroyed
             bool isDead_;
             bool mustDie_;
+
+            //The enemy also has bullets and this will allow it to fore
+            bool enemyCanFire;
+            Geometry* geometryBullet_;
+            Shader* shaderBullet_;
+            GLuint textureBullet_;
+            std::vector<GameObject*>* MainVector;
             
 
            
 
             //These will track when to kill the object
             std::chrono::time_point<std::chrono::system_clock> current_time_, death_time_;
+            
+            std::chrono::time_point<std::chrono::system_clock> fire_time_;
 
             //Need this to do hierarchy transforms
             GameObject* parent_;

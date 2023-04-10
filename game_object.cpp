@@ -32,6 +32,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     //No, this does not mean everything will delete after 100s
     //read the code
     death_time_ = current_time_ + std::chrono::seconds(100);
+    fire_time_ = current_time_ + std::chrono::seconds(2);
     parent_ = nullptr;
     isChild_ = false;
     killCount_ = 0;
@@ -50,6 +51,13 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
 
     //for invincibility
     ghost_ = false;
+
+    //For enemy bullets
+    enemyCanFire = false;
+    geometryBullet_ = geom;
+    shaderBullet_ = shader;
+    textureBullet_ = texture;
+    MainVector = nullptr;
     
    
 }
@@ -139,6 +147,11 @@ void GameObject::Update(double delta_time) {
         //std::cout << "A GameObject has perished" << std::endl;
     }
 
+    /*if (!isDead_ && current_time_ > fire_time_) {
+            Fire(delta_time);
+            fire_time_ = current_time_ + std::chrono::seconds(1);
+    }*/
+
     if (isChild_) {
         if (parent_->CheckDead()) {
             isDead_ = true;
@@ -149,6 +162,32 @@ void GameObject::Update(double delta_time) {
         angle_ = angle_ + ((glm::pi<float>() / 500.0f) * (delta_time*900.0));
     }
   
+}
+
+void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec) {
+    geometryBullet_ = geom;
+    shaderBullet_ = shader;
+    textureBullet_ = texture;
+    MainVector = &vec;
+    enemyCanFire = true;
+
+}
+
+void GameObject::Fire(double delta_time) {
+    if (enemyCanFire) {
+        GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
+
+
+        bullet->SetScale(0.5);
+        bullet->SetMustDie(true, 15);
+        bullet->SetAngle(GetAngle());
+        bullet->SetVelocity(5.0f * GetBearing());
+        bullet->SetType("bullet");
+        MainVector->insert(MainVector->begin() + 1, bullet);
+
+        //bullet->Update(delta_time);
+    }
+
 }
 
 
