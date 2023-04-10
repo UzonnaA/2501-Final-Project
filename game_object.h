@@ -35,8 +35,8 @@ namespace game {
             virtual void Render(glm::mat4 view_matrix, double current_time);
             void LookAtPlayer();
 
-            void InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec);
-            void Fire(double delta_time);
+            void InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec, int type);
+            void Fire();
 
             // Getters
             inline glm::vec3& GetPosition(void) { return position_; }
@@ -94,7 +94,19 @@ namespace game {
 
             inline void SetScale(float scale) { scale_ = scale; }
             void SetAngle(float angle);
-            inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
+            inline void SetVelocity(const glm::vec3& velocity) { 
+                glm::vec3 newVel = velocity;
+
+                if (type_ == "player") {
+                    if (newVel.x < -3.0f) {
+                        newVel.x = -3.0;
+                    }
+                    if (newVel.x > 3.0f) {
+                        newVel.x = 3.0f;
+                    }
+                }
+                velocity_ = newVel; 
+            }
             
             //If you are turnig off must die for some weird reason
             //the value of time doesn't matter

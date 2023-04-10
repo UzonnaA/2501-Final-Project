@@ -34,6 +34,8 @@ namespace game {
     const unsigned int window_height_g = 800;
     const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
     bool UI_on = false;
+    bool game_is_over = false;
+    bool last_frame = false;
     int game_speed = 1;
     std::string survival_time = "N/A";
     static std::chrono::time_point<std::chrono::system_clock> game_start_time = std::chrono::system_clock::now();
@@ -339,6 +341,29 @@ namespace game {
                 ImGui::Text(KillText.c_str());
                 ImGui::Text(MinigunAmmoText.c_str());
 
+                //When the game ends...
+                static int finalKills = 0;
+                static int finalMinutes = 0;
+                static int finalSeconds = 0;
+
+                if (game_is_over && !last_frame) {
+                    finalKills = game_objects_[0]->GetKillCount();
+                    finalMinutes = minutes;
+                    finalSeconds = seconds;
+                    last_frame = true;
+                }
+
+                if (game_is_over) {
+                    ImGui::EndFrame();
+                    ImGui::NewFrame();
+                    ImGui::Text("Game Over!");
+                    std::string ScoreText = "Final Score: " + std::to_string(finalKills);
+                    std::string TimeText = "Time Survived: " + std::to_string(finalMinutes) + "m " + std::to_string(finalSeconds) + "s";
+                    ImGui::Text(ScoreText.c_str());
+                    ImGui::Text(TimeText.c_str());
+                    ImGui::Text("Press ESC to close the game.");
+                }
+
 
 
 
@@ -405,7 +430,7 @@ namespace game {
         for (int i = 0; i < 4 + game_speed; i++) {
             GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[1]);
             enemy1->SetType("enemy");
-            enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_);
+            enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
             game_objects_.insert(game_objects_.begin() + 1, enemy1);
 
         }
@@ -521,10 +546,29 @@ namespace game {
                         other_game_object->Kill();
                         current_game_object->IncrementKillCount();
                         if (current_game_object->GetHealth() <= 0) {
-                            current_game_object->Kill();
-                            std::cout << "Final Score: " + std::to_string(game_objects_[0]->GetKillCount()) << std::endl;
-                            std::cout << "Survival Time: " + survival_time << std::endl;
-                            glfwSetWindowShouldClose(window_, true);
+                            //current_game_object->Kill();
+                            
+                            game_is_over = true;
+                            UI_on = true;
+                            //glfwSetWindowShouldClose(window_, true);
+                            
+
+                        }
+                    }
+                }
+
+                //The following will allow enemy bullets to collide with the player
+                if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "enemyBullet")) {
+                    float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
+                    if (distance < 1.0f) {
+
+                        current_game_object->TakeDamage(1);
+                        other_game_object->Kill();
+                        if (current_game_object->GetHealth() <= 0) {
+                            //current_game_object->Kill();
+                            game_is_over = true;
+                            UI_on = true;
+                            //glfwSetWindowShouldClose(window_, true);
 
                         }
                     }
@@ -642,7 +686,7 @@ namespace game {
             //player->SetPosition(curpos + motion_increment*dir);
         }
         if (glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS) {
-            player->SetPosition(curpos - motion_increment * dir);
+            //player->SetPosition(curpos - motion_increment * dir);
         }
         if (glfwGetKey(window_, GLFW_KEY_TAB) == GLFW_PRESS) {
             //Make it so you can only tab once every 1s (ish)
@@ -660,12 +704,13 @@ namespace game {
 
 
             //player->SetPosition(curpos + motion_increment * 2 * player->GetRight());
-            player->SetVelocity(player->GetVelocity() + motion_increment * player->GetRight());
+            player->SetVelocity(player->GetVelocity() + motion_increment * 5 * player->GetRight());
+            //std::cout << "(" << player->GetVelocity().x  << "," << player->GetVelocity().y << ")" << std::endl;
 
         }
         if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
             // player->SetPosition(curpos - motion_increment * 2 * player->GetRight());
-            player->SetVelocity(player->GetVelocity() - motion_increment * 2 * player->GetRight());
+            player->SetVelocity(player->GetVelocity() - motion_increment * 5 * player->GetRight());
         }
         if (glfwGetKey(window_, GLFW_KEY_Z) == GLFW_PRESS) {
             player->SetPosition(curpos - motion_increment * 2 * player->GetRight());

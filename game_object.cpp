@@ -147,10 +147,9 @@ void GameObject::Update(double delta_time) {
         //std::cout << "A GameObject has perished" << std::endl;
     }
 
-    /*if (!isDead_ && current_time_ > fire_time_) {
-            Fire(delta_time);
-            fire_time_ = current_time_ + std::chrono::seconds(1);
-    }*/
+    if (!isDead_ && current_time_ > fire_time_) {
+            Fire();  
+    }
 
     if (isChild_) {
         if (parent_->CheckDead()) {
@@ -163,18 +162,32 @@ void GameObject::Update(double delta_time) {
     }
   
 }
+/*
+HOW TO MAKE ENEMIES FIRE DIFFERENT BULLETS
 
-void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec) {
+1. Make a new enemy sprite, we'll call this enemy2. Uzonna will handle how to decide when new enemies spawn
+2. Call enemy2.InitFiring() in game.cpp and insert the values needed for a new bullet (like a different texture and stuff, you'll see an example is already there)
+NOTE: Enemies will only hold one kind of bullet data, so when we init we decide the bullet
+3. Add if statements to the Fire() function below to fire the correct bullet based on weaponType, example shown
+5. Make sure to change the fire rate by editing the fire_time. Remember enemies should only fire every 1-5s seconds, unlike the player
+6. DONE!
+
+
+
+*/
+
+void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec, int type) {
     geometryBullet_ = geom;
     shaderBullet_ = shader;
     textureBullet_ = texture;
     MainVector = &vec;
+    weaponType_ = type;
     enemyCanFire = true;
 
 }
 
-void GameObject::Fire(double delta_time) {
-    if (enemyCanFire) {
+void GameObject::Fire() {
+    if (enemyCanFire && weaponType_ == 1) {
         GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
 
 
@@ -182,10 +195,9 @@ void GameObject::Fire(double delta_time) {
         bullet->SetMustDie(true, 15);
         bullet->SetAngle(GetAngle());
         bullet->SetVelocity(5.0f * GetBearing());
-        bullet->SetType("bullet");
+        bullet->SetType("enemyBullet");
         MainVector->insert(MainVector->begin() + 1, bullet);
-
-        //bullet->Update(delta_time);
+        fire_time_ = current_time_ + std::chrono::seconds(2);
     }
 
 }
