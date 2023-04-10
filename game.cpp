@@ -35,6 +35,7 @@ namespace game {
     const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
     bool UI_on = false;
     int game_speed = 1;
+    std::string survival_time = "N/A";
     static std::chrono::time_point<std::chrono::system_clock> game_start_time = std::chrono::system_clock::now();
 
 
@@ -285,7 +286,7 @@ namespace game {
             static int tick = 0;
 
             if (first_wave || current_time2 > last_spawn_time + std::chrono::milliseconds(7000 - game_speed * 400)) {
-                std::cout << "ENEMIES SPAWNED" << std::endl;
+                //std::cout << "ENEMIES SPAWNED" << std::endl;
                 SpawnEnemies(game_objects_[0]->GetPosition());
                 first_wave = false;
                 last_spawn_time = std::chrono::system_clock::now();
@@ -303,6 +304,19 @@ namespace game {
             // Update the game
             Update(view_matrix, delta_time);
 
+            //Computing the time
+            //Get elapsed time in seconds
+            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+            int elapsed_time = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(now - game_start_time).count());
+
+            //Calculate minutes and seconds
+            int minutes = elapsed_time / 60;
+            int seconds = elapsed_time % 60;
+
+            //Format time string
+            std::string time_str = "Time: " + std::to_string(minutes) + "m " + std::to_string(seconds) + "s";
+            survival_time = std::to_string(minutes) + "m " + std::to_string(seconds) + "s";
+
             if (UI_on) {
                 //Start UI
                 //Start a new ImGui frame
@@ -310,17 +324,7 @@ namespace game {
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
 
-                //Computing the time
-                //Get elapsed time in seconds
-                std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-                int elapsed_time = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(now - game_start_time).count());
-
-                //Calculate minutes and seconds
-                int minutes = elapsed_time / 60;
-                int seconds = elapsed_time % 60;
-
-                //Format time string
-                std::string time_str = "Time: " + std::to_string(minutes) + "m " + std::to_string(seconds) + "s";
+               
 
 
 
@@ -401,7 +405,7 @@ namespace game {
         for (int i = 0; i < 4 + game_speed; i++) {
             GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[1]);
             enemy1->SetType("enemy");
-            //enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_);
+            enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_);
             game_objects_.insert(game_objects_.begin() + 1, enemy1);
 
         }
@@ -518,6 +522,8 @@ namespace game {
                         current_game_object->IncrementKillCount();
                         if (current_game_object->GetHealth() <= 0) {
                             current_game_object->Kill();
+                            std::cout << "Final Score: " + std::to_string(game_objects_[0]->GetKillCount()) << std::endl;
+                            std::cout << "Survival Time: " + survival_time << std::endl;
                             glfwSetWindowShouldClose(window_, true);
 
                         }
@@ -580,8 +586,8 @@ namespace game {
 
                             game_objects_[0]->IncrementKillCount();
 
-                            std::cout << "Enemy ship shot down!" << std::endl;
-                            std::cout << "Player Kills: " + std::to_string(game_objects_[0]->GetKillCount()) << std::endl;
+                            //std::cout << "Enemy ship shot down!" << std::endl;
+                            //std::cout << "Player Kills: " + std::to_string(game_objects_[0]->GetKillCount()) << std::endl;
                         }
 
 

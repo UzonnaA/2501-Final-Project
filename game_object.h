@@ -155,7 +155,7 @@ namespace game {
             bool isDead_;
             bool mustDie_;
 
-            //The enemy also has bullets and this will allow it to fore
+            //The enemy also has bullets and this will allow it to fire
             bool enemyCanFire;
             Geometry* geometryBullet_;
             Shader* shaderBullet_;
