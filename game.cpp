@@ -34,6 +34,7 @@ namespace game {
     const unsigned int window_height_g = 800;
     const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
     bool UI_on = false;
+    int minigunAmmoCount = 50;   // global variable denoting the amount of ammo you minigun is currently holding
     bool game_is_over = false;
     bool last_frame = false;
     int game_speed = 1;
@@ -165,6 +166,7 @@ namespace game {
         // Note that, in this specific implementation, the player object should always be the first object in the game object vector 
         PlayerGameObject* player1 = new PlayerGameObject(glm::vec3(0.0f, -2.0f, 0.0f), sprite_, &sprite_shader_, tex_[0]);
         player1->SetType("player");
+        player1->SetGoldShip(tex_[12]);
         game_objects_.push_back(player1);
 
         // Setup other objects
@@ -253,11 +255,13 @@ namespace game {
         SetTexture(tex_[9], (resources_directory_g + std::string("/textures/Star.png")).c_str()); //Star
         SetTexture(tex_[10], (resources_directory_g + std::string("/textures/ammo.png")).c_str()); //Ammo 
         SetTexture(tex_[11], (resources_directory_g + std::string("/textures/heart.png")).c_str()); //Heart
-
+        SetTexture(tex_[12], (resources_directory_g + std::string("/textures/golden_ship.png")).c_str()); //We will switch to this spaceship when we gold invincible
+        
         glBindTexture(GL_TEXTURE_2D, tex_[0]);
     }
 
-    int minigunAmmoCount = 0;   // global variable denoting the amount of ammo you minigun is currently holding
+    
+    
     void Game::MainLoop(void)
     {
         // Loop while the user did not close the window
@@ -357,7 +361,7 @@ namespace game {
                 //Menu Text
                 std::string KillText = "Kill Count: " + std::to_string(game_objects_[0]->GetKillCount());
                 std::string HealthText = "Current Health: " + std::to_string(game_objects_[0]->GetHealth());
-                std::string MinigunAmmoText = "Minigun Ammo: " + std::to_string((50 - minigunAmmoCount));
+                std::string MinigunAmmoText = "Minigun Ammo: " + std::to_string((minigunAmmoCount));
                 ImGui::Text(time_str.c_str());
                 ImGui::Text(HealthText.c_str());
                 ImGui::Text(KillText.c_str());
@@ -453,6 +457,7 @@ namespace game {
             GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[1]);
             enemy1->SetType("enemy");
             enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
+            enemy1->SetMustDie(true, 20);
             game_objects_.insert(game_objects_.begin() + 1, enemy1);
 
         }
@@ -557,6 +562,7 @@ namespace game {
 
             if (current_game_object->CheckGhost()) {
                 //if we're ghosted, stop collision
+                current_game_object->Render(view_matrix, current_time_);
                 continue;
             }
 
@@ -637,6 +643,49 @@ namespace game {
                         }
                     }
                 }
+
+
+                //The following code is collectible collision
+                if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "star")) {
+                    float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
+                    if (distance < 1.0f) {
+
+                        current_game_object->SetStarCount(current_game_object->GetStarCount() + 1);
+                        other_game_object->Kill();
+                        
+                    }
+                }
+
+                if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "ammo")) {
+                    float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
+                    if (distance < 1.0f) {
+
+                        minigunAmmoCount += 10;
+                        if (minigunAmmoCount >= 50) {
+                            minigunAmmoCount = 50;
+                        }
+                        other_game_object->Kill();
+
+                    }
+                }
+
+                if (current_game_object == game_objects_[0] && (other_game_object->GetType() == "heart")) {
+                    float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
+                    if (distance < 1.0f) {
+
+                        current_game_object->SetHealth(current_game_object->GetHealth()+1);
+                        if (current_game_object->GetHealth() >= 5) {
+                            current_game_object->SetHealth(5);
+                        }
+                        other_game_object->Kill();
+
+                    }
+                }
+
+
+
+
+
 
                 //Above is for normal collision, below will be RayCollision
 
@@ -870,7 +919,7 @@ namespace game {
 
             if (player->GetWeaponType() == 3) {
                 if (first_minigun || current_time > last_minigun_time + std::chrono::milliseconds(200)) {
-                    if (minigunAmmoCount <= 50) {
+                    if (minigunAmmoCount > 0) {
                         GameObject* minigun = new GameObject(player->GetPosition(), sprite_, &sprite_shader_, tex_[8]); //need to change texture 
 
                         minigun->SetScale(.15);
@@ -887,7 +936,7 @@ namespace game {
 
                         last_minigun_time = std::chrono::system_clock::now();
                         first_minigun = false;
-                        minigunAmmoCount++;
+                        minigunAmmoCount--;
                     }
                 }
             }

@@ -18,6 +18,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     geometry_ = geom;
     shader_ = shader;
     texture_ = texture;
+    gold_texture_ = texture;
     type_ = "N/A";
     //mustDie is a bool that I turn on if the object needs to disappear automatically
     //Ex: Explosions, Bullets
@@ -33,6 +34,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     //read the code
     death_time_ = current_time_ + std::chrono::seconds(100);
     fire_time_ = current_time_ + std::chrono::seconds(2);
+    invincible_time_ = current_time_ + std::chrono::seconds(100);
     parent_ = nullptr;
     isChild_ = false;
     killCount_ = 0;
@@ -51,6 +53,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
 
     //for invincibility
     ghost_ = false;
+    stars_collected_ = 0;
 
     //For enemy bullets
     enemyCanFire = false;
@@ -160,6 +163,20 @@ void GameObject::Update(double delta_time) {
     if (type_ == "blade") {
         angle_ = angle_ + ((glm::pi<float>() / 500.0f) * (delta_time*900.0));
     }
+
+    //Logic for ghost mode
+    if (type_ == "player" && stars_collected_ == 1 && !ghost_) {
+        SetGhost(true);
+        stars_collected_ = 0;
+        invincible_time_ = current_time_ + std::chrono::seconds(5);
+    }
+
+    if (type_ == "player" && ghost_ && current_time_ > invincible_time_) {
+        SetGhost(false);
+        stars_collected_ = 0;
+    }
+
+
   
 }
 /*
@@ -244,8 +261,15 @@ void GameObject::Render(glm::mat4 view_matrix, double current_time){
         shader_->SetUniform1f("x", 1.0);
     }
 
-    // Bind the entity's texture
-    glBindTexture(GL_TEXTURE_2D, texture_);
+    if (ghost_) {
+        glBindTexture(GL_TEXTURE_2D, gold_texture_);
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, texture_);
+    }
+    
+
+    
 
     // Draw the entity
     glDrawElements(GL_TRIANGLES, geometry_->GetSize(), GL_UNSIGNED_INT, 0);

@@ -42,6 +42,7 @@ namespace game {
             inline glm::vec3& GetPosition(void) { return position_; }
             inline float GetScale(void) { return scale_; }
             inline int GetKillCount(void) { return killCount_; }
+            inline int GetStarCount(void) { return stars_collected_; }
             inline int GetHealth(void) { return health_; }
             inline float GetAngle(void) { return angle_; }
             inline float GetRadius(void) { return radius_; }
@@ -130,6 +131,8 @@ namespace game {
             }
             
             inline void TakeDamage(int damage) { health_ -= damage; }
+            inline void SetHealth(int health) {health_ = health;}
+            inline void SetStarCount(int stars) { stars_collected_ = stars; }
 
             inline void SetParent(GameObject* parent) { 
                 parent_ = parent; 
@@ -144,6 +147,7 @@ namespace game {
             //Setter
             inline void SetMovement(int state) { state_ = state; }
             inline void SetPlayer(glm::vec3 player) { player_pos_ = player; }
+            inline void SetGoldShip(GLuint gold) { gold_texture_ = gold; }
             void UpdateEnemy(double delta_time);
 
         protected:
@@ -162,6 +166,8 @@ namespace game {
 
             // Object's texture reference
             GLuint texture_;
+            GLuint gold_texture_;
+
 
             //This will check if the GO should be destroyed
             bool isDead_;
@@ -178,7 +184,7 @@ namespace game {
            
 
             //These will track when to kill the object
-            std::chrono::time_point<std::chrono::system_clock> current_time_, death_time_;
+            std::chrono::time_point<std::chrono::system_clock> current_time_, death_time_, invincible_time_;
             
             std::chrono::time_point<std::chrono::system_clock> fire_time_;
 
@@ -191,6 +197,9 @@ namespace game {
 
             //Keep track of health
             int health_;
+
+            //Keep track of starts collected for ghosting
+            int stars_collected_;
 
             //for enemy
             int state_;
