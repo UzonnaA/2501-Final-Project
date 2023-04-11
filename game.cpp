@@ -248,6 +248,12 @@ namespace game {
         SetTexture(tex_[6], (resources_directory_g + std::string("/textures/blade.png")).c_str());
         SetTexture(tex_[7], (resources_directory_g + std::string("/textures/aoeSprite.png")).c_str());  //need to change texture
         SetTexture(tex_[8], (resources_directory_g + std::string("/textures/minigun.png")).c_str());  //need to change texture
+        
+        //Textures for collectibles
+        SetTexture(tex_[9], (resources_directory_g + std::string("/textures/Star.png")).c_str()); //Star
+        SetTexture(tex_[10], (resources_directory_g + std::string("/textures/ammo.png")).c_str()); //Ammo 
+        SetTexture(tex_[11], (resources_directory_g + std::string("/textures/heart.png")).c_str()); //Heart
+
         glBindTexture(GL_TEXTURE_2D, tex_[0]);
     }
 
@@ -299,6 +305,22 @@ namespace game {
                 game_speed += 1;
                 tick = 0;
             }
+
+            //Spawn Collectibles
+            static std::chrono::time_point<std::chrono::system_clock> last_collectible_time;
+            static bool first_collectible = true;
+            
+            current_time2 = std::chrono::system_clock::now();
+            
+
+            if (first_collectible || current_time2 > last_collectible_time + std::chrono::milliseconds(4000)) {
+                //std::cout << "ENEMIES SPAWNED" << std::endl;
+                SpawnCollectibles(game_objects_[0]->GetPosition());
+                first_collectible = false;
+                last_collectible_time = std::chrono::system_clock::now();
+            }
+
+            
 
 
 
@@ -434,6 +456,48 @@ namespace game {
             game_objects_.insert(game_objects_.begin() + 1, enemy1);
 
         }
+
+    }
+
+    void Game::SpawnCollectibles(glm::vec3 playerPos) {
+
+        //1 is invincibility (star)
+        //2 is more minigun ammo (ammo)
+        //3 is +1 health (heart)
+
+
+        std::random_device rand_device;
+        std::mt19937 spawn(rand_device());
+        std::uniform_real_distribution<> dis(-3.5, 3.5);
+        std::uniform_real_distribution<> col(1, 4);
+
+        int type = static_cast<int>(col(spawn));
+
+        if (type == 1) {
+            GameObject* collectible = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[9]);
+            collectible->SetType("star");
+            collectible->SetScale(0.5);
+            //collectible->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
+            game_objects_.insert(game_objects_.begin() + 1, collectible);
+        }
+
+        if (type == 2) {
+            GameObject* collectible = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[10]);
+            collectible->SetType("ammo");
+            collectible->SetScale(0.5);
+            //collectible->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
+            game_objects_.insert(game_objects_.begin() + 1, collectible);
+        }
+
+        if (type == 3) {
+            GameObject* collectible = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[11]);
+            collectible->SetType("heart");
+            collectible->SetScale(0.5);
+            //collectible->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
+            game_objects_.insert(game_objects_.begin() + 1, collectible);
+        }
+        
+        
 
     }
 

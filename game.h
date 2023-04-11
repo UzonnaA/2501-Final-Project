@@ -66,6 +66,9 @@ namespace game {
             //New function for enemy spawning over time
             void SpawnEnemies(glm::vec3 playerPos);
 
+            //Function to randomly spawn collectibles
+            void SpawnCollectibles(glm::vec3 playerPos);
+
             // Callback for when the window is resized
             static void ResizeCallback(GLFWwindow* window, int width, int height);
 
