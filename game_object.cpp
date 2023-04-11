@@ -194,6 +194,7 @@ NOTE: Enemies will only hold one kind of bullet data, so when we init we decide 
 */
 
 void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std::vector<GameObject*>& vec, int type) {
+    //This code grants the gameobject the needed data to fire a bullet
     geometryBullet_ = geom;
     shaderBullet_ = shader;
     textureBullet_ = texture;
@@ -204,6 +205,8 @@ void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std:
 }
 
 void GameObject::Fire() {
+    //Here decides what bullet the gameobject will fire
+    //Different weapon types and such would be decided here
     if (enemyCanFire && weaponType_ == 1) {
         GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
 
@@ -221,6 +224,8 @@ void GameObject::Fire() {
 
 
 void GameObject::LookAtPlayer() {
+    //handles enemies turning at the player
+    //Changes their dir based on playerpos to keep it brief
     glm::vec3 direction = player_pos_ - position_;
     float angle = atan2(direction.y, direction.x);
     angle -= glm::half_pi<float>();
@@ -261,7 +266,7 @@ void GameObject::Render(glm::mat4 view_matrix, double current_time){
         shader_->SetUniform1f("x", 1.0);
     }
 
-    if (ghost_) {
+    if (ghost_ && type_ == "player") {
         glBindTexture(GL_TEXTURE_2D, gold_texture_);
     }
     else {
