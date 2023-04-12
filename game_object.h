@@ -218,6 +218,9 @@ namespace game {
             //I'm using this for enemies after they explode, but it will also work for the player
             bool ghost_;
 
+            //using this so the enemy minigun fires in bursts
+            int burst_;
+
             
 
     }; // class GameObject

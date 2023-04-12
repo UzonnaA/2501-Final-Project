@@ -256,7 +256,12 @@ namespace game {
         SetTexture(tex_[10], (resources_directory_g + std::string("/textures/ammo.png")).c_str()); //Ammo 
         SetTexture(tex_[11], (resources_directory_g + std::string("/textures/heart.png")).c_str()); //Heart
         SetTexture(tex_[12], (resources_directory_g + std::string("/textures/golden_ship.png")).c_str()); //We will switch to this spaceship when we gold invincible
-        
+
+        //Textures for new enemies
+        SetTexture(tex_[13], (resources_directory_g + std::string("/textures/red_enemy.png")).c_str()); 
+        SetTexture(tex_[14], (resources_directory_g + std::string("/textures/white_enemy.png")).c_str()); 
+        SetTexture(tex_[15], (resources_directory_g + std::string("/textures/blue_enemy.png")).c_str());
+
         glBindTexture(GL_TEXTURE_2D, tex_[0]);
     }
 
@@ -371,11 +376,13 @@ namespace game {
                 static int finalKills = 0;
                 static int finalMinutes = 0;
                 static int finalSeconds = 0;
+                static int finalScore = 0;
 
                 if (game_is_over && !last_frame) {
                     finalKills = game_objects_[0]->GetKillCount();
                     finalMinutes = minutes;
                     finalSeconds = seconds;
+                    finalScore = (finalSeconds * 10) + (finalMinutes * 60) + (game_speed * 100) + (finalKills * 100);
                     last_frame = true;
                 }
 
@@ -383,10 +390,12 @@ namespace game {
                     ImGui::EndFrame();
                     ImGui::NewFrame();
                     ImGui::Text("Game Over!");
-                    std::string ScoreText = "Final Score: " + std::to_string(finalKills);
+                    std::string KillText = "Total Kills: " + std::to_string(finalKills);
                     std::string TimeText = "Time Survived: " + std::to_string(finalMinutes) + "m " + std::to_string(finalSeconds) + "s";
-                    ImGui::Text(ScoreText.c_str());
+                    std::string ScoreText = "FINAL SCORE: " + std::to_string(finalScore) + " points";
+                    ImGui::Text(KillText.c_str());
                     ImGui::Text(TimeText.c_str());
+                    ImGui::Text(ScoreText.c_str());
                     ImGui::Text("Press ESC to close the game.");
                 }
 
@@ -452,15 +461,45 @@ namespace game {
         std::mt19937 spawn(rand_device());
         std::uniform_real_distribution<> dis(-3.5, 3.5);
 
+        
 
+        
         for (int i = 0; i < 4 + game_speed; i++) {
-            GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[1]);
-            enemy1->SetType("enemy");
-            enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
-            enemy1->SetMustDie(true, 20);
-            game_objects_.insert(game_objects_.begin() + 1, enemy1);
+
+            std::uniform_real_distribution<> col(1, 11);
+            int type = static_cast<int>(col(spawn));
+            
+            if (type >= 1 && type < 7) {
+                //60% chance to spawn normal bullet enemy
+                GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[13]);
+                enemy1->SetType("enemy");
+                enemy1->InitFiring(sprite_, &sprite_shader_, tex_[5], game_objects_, 1);
+                game_objects_.insert(game_objects_.begin() + 1, enemy1);
+            }
+
+            if (type >= 7 && type < 10) {
+                //30% chance to spawn aoe bullet enemy
+                GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[14]);
+                enemy1->SetType("enemy");
+                enemy1->InitFiring(sprite_, &sprite_shader_, tex_[7], game_objects_, 2);
+                game_objects_.insert(game_objects_.begin() + 1, enemy1);
+            }
+
+            if (type >= 10) {
+                //10% chance to spawn minigun enemy
+                GameObject* enemy1 = new GameObject(glm::vec3(dis(spawn), playerPos.y + 7.0f, 0.0f), sprite_, &sprite_shader_, tex_[15]);
+                enemy1->SetType("enemy");
+                enemy1->InitFiring(sprite_, &sprite_shader_, tex_[8], game_objects_, 3);
+                game_objects_.insert(game_objects_.begin() + 1, enemy1);
+            }
+
 
         }
+
+       
+
+
+        
 
     }
 

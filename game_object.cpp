@@ -50,6 +50,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
 
     //for weapon
     weaponType_ = 1;
+    burst_ = 0;
 
     //for invincibility
     ghost_ = false;
@@ -61,6 +62,8 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     shaderBullet_ = shader;
     textureBullet_ = texture;
     MainVector = nullptr;
+
+
     
    
 }
@@ -138,6 +141,11 @@ void GameObject::Update(double delta_time) {
         if (state_ == 2) {
 
         }
+
+        if (position_.y < player_pos_.y - 2) {
+            Kill();
+            std::cout << "Killed offsceen" << std::endl;
+        }
         
     }
     // Update object position with Euler integration
@@ -207,6 +215,12 @@ void GameObject::InitFiring(Geometry* geom, Shader* shader, GLuint texture, std:
 void GameObject::Fire() {
     //Here decides what bullet the gameobject will fire
     //Different weapon types and such would be decided here
+
+    //1 is normal bullet
+    //2 is aoe
+    //3 is minigun
+
+    //I'll probably change spawn rates later too (maybe 60/30/10?)
     if (enemyCanFire && weaponType_ == 1) {
         GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
 
@@ -218,6 +232,51 @@ void GameObject::Fire() {
         bullet->SetType("enemyBullet");
         MainVector->insert(MainVector->begin() + 1, bullet);
         fire_time_ = current_time_ + std::chrono::seconds(2);
+    }
+
+    if (enemyCanFire && weaponType_ == 2) {
+        GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
+
+
+        bullet->SetScale(1.5);
+        bullet->SetMustDie(true, 15);
+        bullet->SetAngle(GetAngle());
+        bullet->SetVelocity(2.5f * GetBearing());
+        bullet->SetType("enemyBullet");
+        MainVector->insert(MainVector->begin() + 1, bullet);
+        fire_time_ = current_time_ + std::chrono::seconds(4);
+
+
+
+    }
+
+    if (enemyCanFire && weaponType_ == 3) {
+        GameObject* bullet = new GameObject(GetPosition(), geometryBullet_, shaderBullet_, textureBullet_);
+
+
+        bullet->SetScale(0.15);
+        bullet->SetMustDie(true, 15);
+        bullet->SetAngle(GetAngle());
+        bullet->SetVelocity(5.0f * GetBearing());
+        bullet->SetType("enemyBullet");
+        MainVector->insert(MainVector->begin() + 1, bullet);
+        burst_ += 1;
+
+        if (burst_ == 3) {
+            fire_time_ = current_time_ + std::chrono::seconds(2);
+            burst_ = 0;
+        }
+        else {
+            fire_time_ = current_time_ + std::chrono::milliseconds(200);
+        }
+
+
+        
+
+
+
+        
+
     }
 
 }

@@ -51,6 +51,7 @@ Finally, when you kill a spaceship with bullets, that causes an explosion.
 UI:
 TAB allows the player to access the menu, which shows health remaining, time spent in game,
 ammo remaining and total kills. The player's total kills and time survived is displayed on death.
+UI uses the external library Dear ImGUI (https://github.com/ocornut/imgui)
 
 
 
