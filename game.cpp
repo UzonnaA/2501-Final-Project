@@ -249,7 +249,7 @@ namespace game {
         SetTexture(tex_[5], (resources_directory_g + std::string("/textures/bullet.png")).c_str());
         SetTexture(tex_[6], (resources_directory_g + std::string("/textures/blade.png")).c_str());
         SetTexture(tex_[7], (resources_directory_g + std::string("/textures/aoeSprite.png")).c_str());  //need to change texture
-        SetTexture(tex_[8], (resources_directory_g + std::string("/textures/minigun.png")).c_str());  //need to change texture
+        SetTexture(tex_[8], (resources_directory_g + std::string("/textures/minigun.png")).c_str());  
         
         //Textures for collectibles
         SetTexture(tex_[9], (resources_directory_g + std::string("/textures/Star.png")).c_str()); //Star
@@ -700,9 +700,9 @@ namespace game {
                     if (distance < 1.0f) {
 
                         minigunAmmoCount += 10;
-                        if (minigunAmmoCount >= 50) {
-                            minigunAmmoCount = 50;
-                        }
+                        //if (minigunAmmoCount >= 50) {
+                            //minigunAmmoCount = 50;
+                        //}
                         other_game_object->Kill();
 
                     }
@@ -713,9 +713,9 @@ namespace game {
                     if (distance < 1.0f) {
 
                         current_game_object->SetHealth(current_game_object->GetHealth()+1);
-                        if (current_game_object->GetHealth() >= 5) {
-                            current_game_object->SetHealth(5);
-                        }
+                        //if (current_game_object->GetHealth() >= 5) {
+                            //current_game_object->SetHealth(5);
+                        //}
                         other_game_object->Kill();
 
                     }
