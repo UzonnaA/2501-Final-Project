@@ -17,8 +17,10 @@ they spawn faster as the game progresses.
 
 
 
-Enemies: Unfinished
-
+Enemies: 
+There are 3 enemy types that randomly spawn. They start at the top of the screen,
+moving in a circle using parametric motion. They can use the same items as the player.
+They move towards the player at close range.
 
 
 Collectible Items:
